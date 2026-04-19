@@ -1563,7 +1563,7 @@
     <div
       style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:rgba(139,92,246,0.06);border-radius:8px 8px 0 0;">
       <span
-        style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--purple);letter-spacing:0.12em;text-transform:uppercase;">✉
+        style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--purple);letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         New Message</span>
       <span id="emailModalClose"
         style="font-size:1.5rem;color:var(--muted);cursor:pointer;line-height:1;transition:color 0.2s;padding:2px 4px;">✕</span>
@@ -1616,7 +1616,7 @@
         <li><a href="#contact">Contact</a></li>
       </ul>
       <div class="rain-toggle">
-        <label for="rainSwitch">🌧 Rain</label>
+        <label for="rainSwitch"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="23" x2="8" y2="23"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="19" x2="12" y2="19"/><line x1="16" y1="19" x2="16" y2="21"/></svg> Rain</label>
         <div class="toggle-switch" id="rainSwitch" onclick="toggleRain()"></div>
       </div>
     </div>
@@ -1633,7 +1633,7 @@
     <a href="#contact" onclick="closeMenu()">Contact</a>
     <div class="mobile-rain">
       <div class="rain-toggle">
-        <label>🌧 Rain</label>
+        <label><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="23" x2="8" y2="23"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="19" x2="12" y2="19"/><line x1="16" y1="19" x2="16" y2="21"/></svg> Rain</label>
         <div class="toggle-switch" id="rainSwitchMobile" onclick="toggleRain()"></div>
       </div>
     </div>
@@ -1715,32 +1715,42 @@
     </div>
     <div class="skills-grid">
       <div class="skill-card reveal reveal-delay-1">
-        <div class="skill-icon">🐍</div>
+        <div class="skill-icon"><img src="media/skills_python.png" width="30" height="30" alt="Python" style="display:block;"></div>
         <div class="skill-name">Python</div>
         <div class="skill-level">Primary Language</div>
       </div>
       <div class="skill-card reveal reveal-delay-1">
-        <div class="skill-icon">🌐</div>
+        <div class="skill-icon" style="display:flex;gap:8px;align-items:center;">
+          <img src="media/skills_html.png" width="26" height="26" alt="HTML" style="display:block;">
+          <img src="media/skills_css.png" width="26" height="26" alt="CSS" style="display:block;">
+          <img src="media/skills_js.png" width="26" height="26" alt="JavaScript" style="display:block;">
+        </div>
         <div class="skill-name">HTML / CSS / JS</div>
         <div class="skill-level">Frontend</div>
       </div>
       <div class="skill-card reveal reveal-delay-2">
-        <div class="skill-icon">🦄</div>
+        <div class="skill-icon"><img src="https://cdn.simpleicons.org/django/44d399" width="30" height="30" alt="Django" style="display:block;"></div>
         <div class="skill-name">Django</div>
         <div class="skill-level">Full Stack Framework</div>
       </div>
       <div class="skill-card reveal reveal-delay-2">
-        <div class="skill-icon">🗄️</div>
+        <div class="skill-icon" style="display:flex;gap:8px;align-items:center;">
+          <img src="media/skills_sqlite.png" width="30" height="30" alt="SQLite" style="display:block;">
+          <img src="media/skills_phpmyadmin.png" width="30" height="30" alt="phpMyAdmin" style="display:block;">
+        </div>
         <div class="skill-name">SQLite / phpMyAdmin</div>
         <div class="skill-level">Database</div>
       </div>
       <div class="skill-card reveal reveal-delay-3">
-        <div class="skill-icon">🤖</div>
+        <div class="skill-icon" style="display:flex;gap:8px;align-items:center;">
+          <img src="media/skills_ollama.png" width="30" height="30" alt="Ollama" style="display:block;">
+          <img src="media/skills_api.png" width="30" height="30" alt="APIs" style="display:block;">
+        </div>
         <div class="skill-name">Local LLM / APIs</div>
         <div class="skill-level">AI Integration</div>
       </div>
       <div class="skill-card reveal reveal-delay-3">
-        <div class="skill-icon">⚡</div>
+        <div class="skill-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
         <div class="skill-name">Vibe Coding</div>
         <div class="skill-level">AI-Assisted Dev</div>
       </div>
@@ -1831,7 +1841,7 @@
     </div>
     <div class="life-grid">
       <div class="life-card gym reveal reveal-delay-1">
-        <div class="life-icon">🏋️</div>
+        <div class="life-icon"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="28" viewBox="0 0 36 28"><rect x="0" y="10" width="4" height="8" rx="1.5" fill="var(--blue)"/><rect x="4" y="5" width="5" height="18" rx="2" fill="var(--blue)" opacity="0.85"/><rect x="9" y="13" width="18" height="2" rx="1" fill="var(--blue)" opacity="0.45"/><rect x="27" y="5" width="5" height="18" rx="2" fill="var(--blue)" opacity="0.85"/><rect x="32" y="10" width="4" height="8" rx="1.5" fill="var(--blue)"/></svg></div>
         <div class="life-title">Gym &amp; Cardio</div>
         <p class="life-desc">4× a week, no excuses. Stationary bike 15 min post-lift. Cardio when the legs hold up.
           Chasing strength and visual gains — despite metabolic bone disease that says otherwise.</p>
@@ -1841,7 +1851,7 @@
         </div>
       </div>
       <div class="life-card game reveal reveal-delay-2">
-        <div class="life-icon">🎮</div>
+        <div class="life-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></div>
         <div class="life-title">Valorant &amp; Dota 2</div>
         <p class="life-desc">Gaming isn't a phase — it's a constant. Valorant for sharp mechanics, Dota 2 for chaos and
           strategy. Competitive when the skill is there. Fun when it isn't. Always playing, employed or not.</p>
@@ -1859,7 +1869,7 @@
         </div>
       </div>
       <div class="life-card debate reveal reveal-delay-3">
-        <div class="life-icon">🗣️</div>
+        <div class="life-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="13" y2="14"/></svg></div>
         <div class="life-title">Debate</div>
         <p class="life-desc">Competed in the first-ever Batang Surigaonon Debate Competition · December 7–8, 2024 · C.V.
           Diez Memorial Central Elementary School. Argued with discipline and resolve.</p>
@@ -1867,11 +1877,11 @@
           <img src="media/debate_proof.jpg" alt="Debate Proof" />
           <div class="media-hint">Click to expand</div>
           <a href="https://www.facebook.com/share/p/17LN5KdVNL/" target="_blank" class="debate-link"
-            onclick="event.stopPropagation()">🌐 View Proof</a>
+            onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> View Proof</a>
         </div>
       </div>
       <div class="life-card pwd reveal reveal-delay-1">
-        <div class="life-icon">♿</div>
+        <div class="life-icon"><img src="media/disability.png" width="34" height="34" alt="Disability Icon" style="display:block; background-color: rgba(96, 165, 250, 0.2); padding: 8px; border-radius: 8px; box-shadow: 0 0 10px rgba(96, 165, 250, 0.1);"></div>
         <div class="life-title">Living with Metabolic Bone Disease</div>
         <p class="life-desc">My legs are weak. My cardio is a slow jog when they hold up and a walk when they don't. But
           I go. Every time. I don't use my disability as a ceiling — only as context. The discipline I've built around
@@ -1889,10 +1899,10 @@
       <p class="contact-lead reveal">Whether you want to collaborate on a project, talk code, or just want to tell me my
         Dota 2 plays are bad — I'm reachable.</p>
       <div class="contact-links reveal reveal-delay-1">
-        <a href="#" class="contact-link" id="emailBtn" onclick="openEmailModal(event)">✉ <span
+        <a href="#" class="contact-link" id="emailBtn" onclick="openEmailModal(event)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> <span
             id="contact-email"></span></a>
         <a href="https://www.facebook.com/share/1CMJzS6NKH/?mibextid=wwXIfr" target="_blank" class="contact-link fb"
-          id="fbBtn">🌐 Facebook</a>
+          id="fbBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> Facebook</a>
       </div>
     </div>
   </section>
