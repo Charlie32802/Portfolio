@@ -4866,10 +4866,20 @@
                 if (isMobile) promptEl.textContent = 'tap anywhere to continue';
                 promptEl.classList.add('show');
                 var _introAudios = [];
+                var _introThunderPool = [];
+                var _introThunderIdx = 0;
                 function exitIntro() {
                   document.removeEventListener('keydown', exitIntro);
                   document.removeEventListener('click', exitIntro);
                   document.removeEventListener('touchstart', exitIntro);
+                  for (var ti = 0; ti < 4; ti++) {
+                    var t = new Audio('media/thunder.mp3');
+                    t.preload = 'auto';
+                    t.volume = 0;
+                    t.play().then(function () { this.pause(); this.currentTime = 0; }.bind(t)).catch(function () {});
+                    _introThunderPool.push(t);
+                    _introAudios.push(t);
+                  }
                   var clap1 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap1.preload = 'auto';
                   clap1.volume = 1.0;
@@ -4969,20 +4979,12 @@
                   }
                   function playIntroThunder() {
                     try {
-                      var snd = new Audio('media/thunder.mp3');
+                      var snd = _introThunderPool[_introThunderIdx % _introThunderPool.length];
+                      _introThunderIdx++;
                       snd.volume = 1.0;
                       snd.playbackRate = 0.85 + Math.random() * 0.3;
-                      snd.preload = 'auto';
-                      var setTime = function () {
-                        try {
-                          snd.currentTime = 1.2;
-                        } catch (err) {}
-                      };
-                      snd.addEventListener('loadedmetadata', setTime);
-                      snd.play().then(function () {
-                        setTime();
-                      }).catch(function () {});
-                      _introAudios.push(snd);
+                      snd.currentTime = 1.2;
+                      snd.play().catch(function () {});
                     } catch (e) {}
                   }
                   function showBoltGroup(side, count, stayMs, cb) {
