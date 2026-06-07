@@ -3453,12 +3453,20 @@
         if (typeof _thunderPool !== 'undefined') {
           _thunderPool.forEach(function (item) {
             if (!item.unlocked) {
-              item.el.volume = 0;
+              item.el.muted = true;
               var p = item.el.play();
               if (p !== undefined) {
-                p.then(function () { item.el.pause(); item.el.currentTime = 0; item.unlocked = true; }).catch(function () { });
+                p.then(function () { 
+                  item.el.pause(); 
+                  item.el.muted = false; 
+                  item.el.currentTime = 0; 
+                  item.unlocked = true; 
+                }).catch(function () { });
               } else {
-                item.el.pause(); item.el.currentTime = 0; item.unlocked = true;
+                item.el.pause(); 
+                item.el.muted = false; 
+                item.el.currentTime = 0; 
+                item.unlocked = true;
               }
             }
           });
@@ -3763,22 +3771,20 @@
       }
     }
 
+    const _musicEvts = ['click', 'touchstart', 'keydown', 'mousedown'];
+    var _musicAttempted = false;
     function tryPlayMusic() {
-      if (musicOn) {
-        if (!portfolioMusic) {
-          portfolioMusic = new Audio('media/portfolio_music.mp3');
-          portfolioMusic.loop = true;
-        }
-        portfolioMusic.play().then(() => {
-          document.removeEventListener('click', tryPlayMusic);
-          document.removeEventListener('touchstart', tryPlayMusic);
-          document.removeEventListener('keydown', tryPlayMusic);
-        }).catch(err => {
-          // autoplay blocked initially, will retry on user gesture
-        });
-      }
+      if (!musicOn || _musicAttempted) return;
+      _musicAttempted = true;
+      portfolioMusic = new Audio('media/portfolio_music.mp3');
+      portfolioMusic.loop = true;
+      portfolioMusic.play().then(function() {
+        _musicEvts.forEach(function(evt) { document.removeEventListener(evt, tryPlayMusic); });
+      }).catch(function() {
+        portfolioMusic = null;
+        _musicAttempted = false;
+      });
     }
-    // Music is triggered only from within exitIntro, not on global events during intro
 
     const $emailModal = document.getElementById('email-modal');
     const $emailBackdrop = document.getElementById('email-backdrop');
@@ -4715,6 +4721,46 @@
         pre.remove();
         document.body.classList.add('intro-done');
         applyQualityMode();
+        
+        document.body.style.overflow = 'hidden';
+        
+        var blackout = document.createElement('div');
+        blackout.style.cssText = 'position:fixed;inset:0;z-index:999997;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;transition:opacity 0.8s ease;';
+        
+        var promptEl = document.createElement('div');
+        promptEl.className = 'pre-prompt glitch show';
+        var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        promptEl.textContent = isMobile ? 'tap anywhere to continue' : 'click anywhere to continue';
+        promptEl.style.cssText = 'opacity:1;position:relative;z-index:999998;transition:opacity 0.5s ease;text-transform:uppercase;letter-spacing:0.15em;color:var(--text);font-size:0.9rem;';
+        blackout.appendChild(promptEl);
+        document.body.appendChild(blackout);
+
+        function startFromSkip() {
+          document.body.style.overflow = '';
+          blackout.style.opacity = '0';
+          blackout.style.pointerEvents = 'none';
+          promptEl.style.opacity = '0';
+          setTimeout(function() { if(blackout.parentNode) blackout.remove(); }, 800);
+          
+          if (typeof _musicEvts !== 'undefined') {
+            _musicEvts.forEach(function(evt) { document.removeEventListener(evt, startFromSkip); });
+          } else {
+            ['click', 'touchstart', 'keydown', 'mousedown'].forEach(function(evt) { document.removeEventListener(evt, startFromSkip); });
+          }
+        }
+
+        if (typeof _musicEvts !== 'undefined') {
+          _musicEvts.forEach(function(evt) { 
+            document.addEventListener(evt, startFromSkip); 
+            document.addEventListener(evt, tryPlayMusic);
+          });
+        } else {
+          ['click', 'touchstart', 'keydown', 'mousedown'].forEach(function(evt) { 
+            document.addEventListener(evt, startFromSkip); 
+            document.addEventListener(evt, tryPlayMusic);
+          });
+        }
+        
         return;
       }
 
@@ -4875,21 +4921,34 @@
                   for (var ti = 0; ti < 4; ti++) {
                     var t = new Audio('media/thunder.mp3');
                     t.preload = 'auto';
-                    t.volume = 0;
-                    t.play().then(function () { this.pause(); this.currentTime = 0; }.bind(t)).catch(function () {});
+                    t.muted = true;
+                    t.play().then(function () { 
+                      this.pause(); 
+                      this.muted = false; 
+                      this.currentTime = 0; 
+                    }.bind(t)).catch(function () {});
                     _introThunderPool.push(t);
                     _introAudios.push(t);
                   }
                   var clap1 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap1.preload = 'auto';
                   clap1.volume = 1.0;
+                  clap1.muted = true;
+                  clap1.play().then(function () { 
+                    this.pause(); 
+                    this.muted = false; 
+                    this.currentTime = 0; 
+                  }.bind(clap1)).catch(function () {});
+
                   var clap2 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap2.preload = 'auto';
                   clap2.volume = 0.5;
-                  try {
-                    clap1.load();
-                    clap2.load();
-                  } catch (e) {}
+                  clap2.muted = true;
+                  clap2.play().then(function () { 
+                    this.pause(); 
+                    this.muted = false; 
+                    this.currentTime = 0; 
+                  }.bind(clap2)).catch(function () {});
                   try {
                     rainOn = false;
                     var rs = document.getElementById('rainSwitch');
@@ -4914,9 +4973,11 @@
                     });
                   } catch (e) {}
                   tryPlayMusic();
-                  document.addEventListener('click', tryPlayMusic);
-                  document.addEventListener('touchstart', tryPlayMusic);
-                  document.addEventListener('keydown', tryPlayMusic);
+                  if (typeof _musicEvts !== 'undefined') {
+                    _musicEvts.forEach(function(evt) { document.addEventListener(evt, tryPlayMusic); });
+                  } else {
+                    ['click', 'touchstart', 'keydown', 'mousedown'].forEach(function(evt) { document.addEventListener(evt, tryPlayMusic); });
+                  }
                   var prevUltra = ultraMode;
                   ultraMode = false;
                   initDrops();
