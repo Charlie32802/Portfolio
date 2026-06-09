@@ -2363,13 +2363,44 @@
       }
     }
 
+    .skip-intro-btn {
+      position: fixed;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999998;
+      background: #0a0a14;
+      margin: 0;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      animation: fadeInBtn 1s ease 0.5s forwards;
+    }
+    @keyframes fadeInBtn {
+      to { opacity: 1; pointer-events: auto; }
+    }
+    .skip-intro-btn:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--purple);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    }
+
     #preParticles {
       position: absolute;
       inset: 0;
       z-index: 0;
     }
 
-    #preloader>*:not(#preParticles):not(.pre-counter):not(.pre-year):not(#damascus-bg) {
+    #preloader>*:not(#preParticles):not(.pre-counter):not(.pre-year):not(#damascus-bg):not(#skipIntroBtn) {
       position: relative;
       z-index: 1;
     }
@@ -2687,11 +2718,11 @@
 
   <div id="ambient-lite"></div>
   <div id="cursor-pos"
-    style="position:fixed;top:0;left:0;pointer-events:none;z-index:10000;will-change:transform;contain:layout style;">
+    style="position:fixed;top:0;left:0;pointer-events:none;z-index:9999999;will-change:transform;contain:layout style;">
     <div id="cursor"></div>
   </div>
   <div id="cursor-ring-pos"
-    style="position:fixed;top:0;left:0;pointer-events:none;z-index:10000;will-change:transform;contain:layout style;">
+    style="position:fixed;top:0;left:0;pointer-events:none;z-index:9999999;will-change:transform;contain:layout style;">
     <div id="cursor-ring"></div>
   </div>
   <canvas id="canvas"></canvas>
@@ -2700,8 +2731,9 @@
   <canvas id="tsunami-canvas"></canvas>
   <div id="mist-overlay"></div>
 
-  <div id="preloader">
+  <button id="skipIntroBtn" class="skip-intro-btn" onclick="skipIntroSequence(event)">SKIP INTRO</button>
 
+  <div id="preloader">
     <div id="damascus-bg" class="damascus-lite"></div>
     <canvas id="preParticles"></canvas>
     <div class="pre-year" id="preYear">© 2026</div>
@@ -4684,6 +4716,51 @@
     }, { threshold: 0.5 });
     document.querySelectorAll('.stat-num').forEach(function (el) { statObs.observe(el); });
 
+    window.skipIntroSequence = function(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      var skipBtnImmediate = document.getElementById('skipIntroBtn');
+      if (skipBtnImmediate) { skipBtnImmediate.style.display = 'none'; skipBtnImmediate.remove(); }
+      window._introSkipped = true;
+      sessionStorage.setItem('introPlayed', '1');
+      tryPlayMusic();
+      
+      var introBlackout = document.getElementById('intro-blackout');
+      if (introBlackout) introBlackout.remove();
+      var introPrecanvas = document.getElementById('intro-precanvas');
+      if (introPrecanvas) introPrecanvas.remove();
+      
+      if (typeof stopFlickering === 'function') {
+        try { stopFlickering(); } catch(e) {}
+      }
+
+      var rc = document.getElementById('rain-canvas');
+      if (rc) {
+         rc.style.zIndex = '';
+         rc.classList.remove('active');
+         if (typeof rctx !== 'undefined' && rctx) {
+           rctx.clearRect(0, 0, rc.width, rc.height);
+         }
+      }
+
+      var pre = document.getElementById('preloader');
+      if (pre) {
+        pre.style.pointerEvents = 'none';
+        pre.style.transition = 'opacity 0.8s ease';
+        pre.style.opacity = '0';
+        document.body.style.overflow = '';
+        var skipBtn = document.getElementById('skipIntroBtn');
+        if (skipBtn) { skipBtn.style.transition = 'opacity 0.4s ease'; skipBtn.style.opacity = '0'; setTimeout(function(){ skipBtn.remove(); }, 400); }
+        setTimeout(function() {
+          pre.remove();
+          document.body.classList.add('intro-done');
+          applyQualityMode();
+        }, 800);
+      } else {
+        var skipBtn = document.getElementById('skipIntroBtn');
+        if (skipBtn) { skipBtn.style.transition = 'opacity 0.4s ease'; skipBtn.style.opacity = '0'; setTimeout(function(){ skipBtn.remove(); }, 400); }
+      }
+    };
+
     (function () {
       var pre = document.getElementById('preloader');
       if (!pre) { applyQualityMode(); return; }
@@ -4878,7 +4955,9 @@
               ctrEl.style.transition = 'opacity 0.6s ease';
               ctrEl.style.opacity = '0';
               setTimeout(function () {
+                if (window._introSkipped) return;
                 var promptEl = document.getElementById('prePrompt');
+                if (!promptEl) return;
                 var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
                 if (isMobile) promptEl.textContent = 'tap anywhere to continue';
                 promptEl.classList.add('show');
@@ -4944,6 +5023,7 @@
                   blackout.style.cssText = 'position:fixed;inset:0;z-index:999997;background:#000;opacity:0;pointer-events:none;transition:opacity 0.18s ease;';
                   document.body.appendChild(blackout);
                   var preCanvas = document.createElement('canvas');
+                  preCanvas.id = 'intro-precanvas';
                   preCanvas.style.cssText = 'position:fixed;inset:0;z-index:999999;pointer-events:none;';
                   document.body.appendChild(preCanvas);
                   var preCtx = preCanvas.getContext('2d');
@@ -5002,15 +5082,19 @@
                     } catch (e) {}
                   }
                   function showBoltGroup(side, count, stayMs, cb) {
+                    if (window._introSkipped) return;
                     preCanvas.style.opacity = '0';
                     preCanvas.style.transition = 'opacity 0.3s ease';
                     drawGroup(side, count);
                     playIntroThunder();
                     requestAnimationFrame(function () {
+                      if (window._introSkipped) return;
                       preCanvas.style.opacity = '1';
                       setTimeout(function () {
+                        if (window._introSkipped) return;
                         preCanvas.style.opacity = '0';
                         setTimeout(function () {
+                          if (window._introSkipped) return;
                           preCtx.clearRect(0, 0, preCanvas.width, preCanvas.height);
                           preCanvas.style.transition = '';
                           preCanvas.style.opacity = '1';
@@ -5052,12 +5136,15 @@
                     preCtx.fillRect(0, 0, W, H);
                   }
                   function showMassiveStorm(stayMs, cb) {
+                    if (window._introSkipped) return;
                     preCanvas.style.opacity = '0';
                     preCanvas.style.transition = 'opacity 1.2s ease';
                     drawMassiveStorm();
                     requestAnimationFrame(function () {
+                      if (window._introSkipped) return;
                       preCanvas.style.opacity = '1';
                       setTimeout(function () {
+                        if (window._introSkipped) return;
                         if (cb) cb();
                       }, stayMs);
                     });
@@ -5067,6 +5154,7 @@
                   }
                   startFlickering();
                   setTimeout(function () {
+                    if (window._introSkipped) return;
                     var lc1 = 1 + Math.floor(Math.random() * 2);
                     showBoltGroup('left', lc1, 2000, function () {
                       setTimeout(function () {
@@ -5085,6 +5173,7 @@
                                       clap2.play().catch(function () {});
                                     } catch (e) {}
                                     setTimeout(function () {
+                                      if (window._introSkipped) return;
                                       rainOn = false;
                                       rc.style.zIndex = '';
                                       rc.classList.remove('active');
@@ -5095,6 +5184,9 @@
                                       applyQualityMode();
                                       pRun = false;
                                       showMassiveStorm(4500, function () {
+                                        if (window._introSkipped) return;
+                                        var skipBtnEl = document.getElementById('skipIntroBtn');
+                                        if (skipBtnEl) { skipBtnEl.style.transition = 'opacity 0.4s ease'; skipBtnEl.style.opacity = '0'; setTimeout(function(){ skipBtnEl.remove(); }, 400); }
                                         pre.style.display = 'none';
                                         pre.classList.add('exit');
                                         document.body.classList.add('intro-done');
