@@ -5180,13 +5180,18 @@
                                       rctx.clearRect(0, 0, rc.width, rc.height);
                                       blackout.style.transition = 'opacity 1.2s ease';
                                       blackout.style.opacity = '1.0';
+                                      var _skipBtnSync = document.getElementById('skipIntroBtn');
+                                      if (_skipBtnSync) {
+                                        _skipBtnSync.style.pointerEvents = 'none';
+                                        _skipBtnSync.style.transition = 'opacity 0.4s ease';
+                                        _skipBtnSync.style.opacity = '0';
+                                        setTimeout(function () { if (_skipBtnSync.parentNode) _skipBtnSync.remove(); }, 450);
+                                      }
                                       sessionStorage.setItem('introPlayed', '1');
                                       applyQualityMode();
                                       pRun = false;
                                       showMassiveStorm(4500, function () {
                                         if (window._introSkipped) return;
-                                        var skipBtnEl = document.getElementById('skipIntroBtn');
-                                        if (skipBtnEl) { skipBtnEl.style.transition = 'opacity 0.4s ease'; skipBtnEl.style.opacity = '0'; setTimeout(function(){ skipBtnEl.remove(); }, 400); }
                                         pre.style.display = 'none';
                                         pre.classList.add('exit');
                                         document.body.classList.add('intro-done');
