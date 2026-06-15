@@ -4972,42 +4972,41 @@
                   document.removeEventListener('click', exitIntro);
                   document.removeEventListener('touchstart', exitIntro);
 
-                  function unlockAudio(audio) {
+                  var INTRO_THUNDER_START_TIME = 0.8;
+                  var INTRO_THUNDER_VISUAL_DELAY = 800;
+
+                  function unlockSilent(audio, targetTime) {
+                    audio.volume = 0;
                     audio.muted = true;
                     try {
                       var p = audio.play();
                       if (p !== undefined) {
                         p.then(function() {
                           audio.pause();
-                          audio.currentTime = 0;
-                          audio.muted = false;
-                        }).catch(function() {
-                          audio.muted = false;
-                        });
+                          audio.currentTime = targetTime || 0;
+                        }).catch(function() {});
                       } else {
                         audio.pause();
-                        audio.currentTime = 0;
-                        audio.muted = false;
+                        audio.currentTime = targetTime || 0;
                       }
-                    } catch(e) { audio.muted = false; }
+                    } catch(e) {}
                   }
 
                   for (var ti = 0; ti < 4; ti++) {
                     var t = new Audio('media/thunder.mp3');
                     t.preload = 'auto';
-                    unlockAudio(t);
+                    t.playbackRate = 0.85 + Math.random() * 0.3;
+                    unlockSilent(t, INTRO_THUNDER_START_TIME);
                     _introThunderPool.push(t);
                     _introAudios.push(t);
                   }
                   var clap1 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap1.preload = 'auto';
-                  clap1.volume = 1.0;
-                  unlockAudio(clap1);
+                  unlockSilent(clap1);
 
                   var clap2 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap2.preload = 'auto';
-                  clap2.volume = 0.5;
-                  unlockAudio(clap2);
+                  unlockSilent(clap2);
                   try {
                     rainOn = false;
                     var rs = document.getElementById('rainSwitch');
@@ -5102,33 +5101,38 @@
                     try {
                       var snd = _introThunderPool[_introThunderIdx % _introThunderPool.length];
                       _introThunderIdx++;
+                      snd.muted = false;
                       snd.volume = 1.0;
-                      snd.playbackRate = 0.85 + Math.random() * 0.3;
-                      snd.currentTime = 1.2;
+                      if (snd.currentTime < (INTRO_THUNDER_START_TIME - 0.1)) {
+                        snd.currentTime = INTRO_THUNDER_START_TIME;
+                      }
                       snd.play().catch(function () {});
                     } catch (e) {}
                   }
                   function showBoltGroup(side, count, stayMs, cb) {
                     if (window._introSkipped) return;
-                    preCanvas.style.opacity = '0';
-                    preCanvas.style.transition = 'opacity 0.3s ease';
-                    drawGroup(side, count);
                     playIntroThunder();
-                    requestAnimationFrame(function () {
+                    setTimeout(function () {
                       if (window._introSkipped) return;
-                      preCanvas.style.opacity = '1';
-                      setTimeout(function () {
+                      preCanvas.style.opacity = '0';
+                      preCanvas.style.transition = 'opacity 0.3s ease';
+                      drawGroup(side, count);
+                      requestAnimationFrame(function () {
                         if (window._introSkipped) return;
-                        preCanvas.style.opacity = '0';
+                        preCanvas.style.opacity = '1';
                         setTimeout(function () {
                           if (window._introSkipped) return;
-                          preCtx.clearRect(0, 0, preCanvas.width, preCanvas.height);
-                          preCanvas.style.transition = '';
-                          preCanvas.style.opacity = '1';
-                          if (cb) cb();
-                        }, 300);
-                      }, stayMs);
-                    });
+                          preCanvas.style.opacity = '0';
+                          setTimeout(function () {
+                            if (window._introSkipped) return;
+                            preCtx.clearRect(0, 0, preCanvas.width, preCanvas.height);
+                            preCanvas.style.transition = '';
+                            preCanvas.style.opacity = '1';
+                            if (cb) cb();
+                          }, 300);
+                        }, stayMs);
+                      });
+                    }, INTRO_THUNDER_VISUAL_DELAY);
                   }
                   var flickerInterval;
                   function startFlickering() {
@@ -5180,8 +5184,12 @@
                     clearInterval(flickerInterval);
                   }
                   startFlickering();
-                  setTimeout(function () {
-                    if (window._introSkipped) return;
+
+                  var thundersStarted = false;
+                  function startThundersSequence() {
+                    if (thundersStarted || window._introSkipped) return;
+                    thundersStarted = true;
+
                     var lc1 = 1 + Math.floor(Math.random() * 2);
                     showBoltGroup('left', lc1, 2000, function () {
                       setTimeout(function () {
@@ -5203,7 +5211,11 @@
                                       setTimeout(function () { if (_skipBtnFinal.parentNode) _skipBtnFinal.remove(); }, 600);
                                     }
                                     try {
+                                      clap1.muted = false;
+                                      clap1.volume = 1.0;
                                       clap1.play().catch(function () {});
+                                      clap2.muted = false;
+                                      clap2.volume = 0.5;
                                       clap2.play().catch(function () {});
                                     } catch (e) {}
                                     setTimeout(function () {
@@ -5242,7 +5254,22 @@
                         });
                       }, 300);
                     });
-                  }, 4000);
+                  }
+
+                  var fallbackTimer = setTimeout(startThundersSequence, 3500);
+
+                  var musicCheckInterval = setInterval(function () {
+                    if (window._introSkipped || thundersStarted) {
+                      clearInterval(musicCheckInterval);
+                      clearTimeout(fallbackTimer);
+                      return;
+                    }
+                    if (portfolioMusic && !portfolioMusic.paused && portfolioMusic.currentTime >= 3.0) {
+                      clearInterval(musicCheckInterval);
+                      clearTimeout(fallbackTimer);
+                      startThundersSequence();
+                    }
+                  }, 50);
                 }
 
                 document.addEventListener('keydown', exitIntro);
