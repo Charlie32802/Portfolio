@@ -4972,8 +4972,9 @@
                   document.removeEventListener('click', exitIntro);
                   document.removeEventListener('touchstart', exitIntro);
 
+                  var isMobileDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
                   var INTRO_THUNDER_START_TIME = 0.8;
-                  var INTRO_THUNDER_VISUAL_DELAY = 800;
+                  var INTRO_THUNDER_VISUAL_DELAY = isMobileDevice ? 300 : 800;
 
                   function unlockSilent(audio, targetTime) {
                     audio.volume = 0;
