@@ -3004,8 +3004,9 @@
         <div class="skill-icon" style="display:flex;gap:8px;align-items:center;">
           <img src="media/skills_sqlite.png" width="30" height="30" alt="SQLite" style="display:block;">
           <img src="media/skills_phpmyadmin.png" width="30" height="30" alt="phpMyAdmin" style="display:block;">
+          <img src="media/skills_postgre.png" width="30" height="30" alt="PostgreSQL" style="display:block;">
         </div>
-        <div class="skill-name">SQLite / phpMyAdmin</div>
+        <div class="skill-name">SQLite / phpMyAdmin / PostgreSQL</div>
         <div class="skill-level">Database</div>
       </div>
       <div class="skill-card reveal reveal-delay-3">
@@ -4766,6 +4767,8 @@
       if (!pre) { applyQualityMode(); return; }
 
       if (sessionStorage.getItem('introPlayed')) {
+        var skipBtn = document.getElementById('skipIntroBtn');
+        if (skipBtn) skipBtn.remove();
         pre.remove();
         document.body.classList.add('intro-done');
         applyQualityMode();
@@ -4968,19 +4971,43 @@
                   document.removeEventListener('keydown', exitIntro);
                   document.removeEventListener('click', exitIntro);
                   document.removeEventListener('touchstart', exitIntro);
+
+                  function unlockAudio(audio) {
+                    audio.muted = true;
+                    try {
+                      var p = audio.play();
+                      if (p !== undefined) {
+                        p.then(function() {
+                          audio.pause();
+                          audio.currentTime = 0;
+                          audio.muted = false;
+                        }).catch(function() {
+                          audio.muted = false;
+                        });
+                      } else {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        audio.muted = false;
+                      }
+                    } catch(e) { audio.muted = false; }
+                  }
+
                   for (var ti = 0; ti < 4; ti++) {
                     var t = new Audio('media/thunder.mp3');
                     t.preload = 'auto';
+                    unlockAudio(t);
                     _introThunderPool.push(t);
                     _introAudios.push(t);
                   }
                   var clap1 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap1.preload = 'auto';
                   clap1.volume = 1.0;
+                  unlockAudio(clap1);
 
                   var clap2 = new Audio('media/thunder_clap_sound_effect.mp3');
                   clap2.preload = 'auto';
                   clap2.volume = 0.5;
+                  unlockAudio(clap2);
                   try {
                     rainOn = false;
                     var rs = document.getElementById('rainSwitch');
@@ -5168,6 +5195,13 @@
                                 showBoltGroup('right', rc2, 2000, function () {
                                   setTimeout(function () {
                                     stopFlickering();
+                                    var _skipBtnFinal = document.getElementById('skipIntroBtn');
+                                    if (_skipBtnFinal) {
+                                      _skipBtnFinal.style.pointerEvents = 'none';
+                                      _skipBtnFinal.style.transition = 'opacity 0.6s ease';
+                                      _skipBtnFinal.style.opacity = '0';
+                                      setTimeout(function () { if (_skipBtnFinal.parentNode) _skipBtnFinal.remove(); }, 600);
+                                    }
                                     try {
                                       clap1.play().catch(function () {});
                                       clap2.play().catch(function () {});
@@ -5180,13 +5214,6 @@
                                       rctx.clearRect(0, 0, rc.width, rc.height);
                                       blackout.style.transition = 'opacity 1.2s ease';
                                       blackout.style.opacity = '1.0';
-                                      var _skipBtnSync = document.getElementById('skipIntroBtn');
-                                      if (_skipBtnSync) {
-                                        _skipBtnSync.style.pointerEvents = 'none';
-                                        _skipBtnSync.style.transition = 'opacity 0.4s ease';
-                                        _skipBtnSync.style.opacity = '0';
-                                        setTimeout(function () { if (_skipBtnSync.parentNode) _skipBtnSync.remove(); }, 450);
-                                      }
                                       sessionStorage.setItem('introPlayed', '1');
                                       applyQualityMode();
                                       pRun = false;
