@@ -4724,9 +4724,7 @@
 
         _threeCleanup = function () {
           run = false;
-          window.removeEventListener('mousemove', onMM);
           window.removeEventListener('resize', onRz);
-          if (heroContent) heroContent.style.transform = '';
           cv.classList.remove('active');
           sGeo.dispose(); sMat.dispose();
           iGeo.dispose(); iMat.dispose();
