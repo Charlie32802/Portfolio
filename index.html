@@ -3983,6 +3983,13 @@
     });
 
     let ultraMode = localStorage.getItem('portfolioQuality') === 'ultra';
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      ultraMode = false;
+      const qd = document.querySelector('.quality-toggle-desktop');
+      const qm = document.querySelector('.mobile-quality');
+      if (qd) qd.style.display = 'none';
+      if (qm) qm.style.display = 'none';
+    }
 
     function applyQualityMode() {
       const qs = document.getElementById('qualitySwitch');
