@@ -3983,12 +3983,44 @@
     });
 
     let ultraMode = localStorage.getItem('portfolioQuality') === 'ultra';
+    const qd = document.querySelector('.quality-toggle-desktop');
+    const qm = document.querySelector('.mobile-quality');
     if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
       ultraMode = false;
-      const qd = document.querySelector('.quality-toggle-desktop');
-      const qm = document.querySelector('.mobile-quality');
       if (qd) qd.style.display = 'none';
       if (qm) qm.style.display = 'none';
+    } else {
+      const storedFps = localStorage.getItem('ultraSupported');
+      if (storedFps === 'false') {
+        ultraMode = false;
+        if (qd) qd.style.display = 'none';
+        if (qm) qm.style.display = 'none';
+      } else if (storedFps !== 'true') {
+        if (qd) { qd.style.opacity = '0'; qd.style.pointerEvents = 'none'; qd.style.transition = 'opacity 0.8s'; }
+        if (qm) { qm.style.opacity = '0'; qm.style.pointerEvents = 'none'; qm.style.transition = 'opacity 0.8s'; }
+        let frames = 0;
+        let startTime = performance.now();
+        function measureFps() {
+          frames++;
+          const elapsed = performance.now() - startTime;
+          if (elapsed < 2000) {
+            requestAnimationFrame(measureFps);
+          } else {
+            if (frames / (elapsed / 1000) >= 35) {
+              localStorage.setItem('ultraSupported', 'true');
+              if (qd) { qd.style.opacity = '1'; qd.style.pointerEvents = 'auto'; }
+              if (qm) { qm.style.opacity = '1'; qm.style.pointerEvents = 'auto'; }
+            } else {
+              localStorage.setItem('ultraSupported', 'false');
+              ultraMode = false;
+              if (qd) qd.style.display = 'none';
+              if (qm) qm.style.display = 'none';
+              if (typeof applyQualityMode === 'function') applyQualityMode();
+            }
+          }
+        }
+        requestAnimationFrame(measureFps);
+      }
     }
 
     function applyQualityMode() {
